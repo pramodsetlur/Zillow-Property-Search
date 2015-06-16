@@ -1,0 +1,592 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+        <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+        
+    
+        <style>
+            .searchHeading{
+                font-size: 20px;
+                color: orange;
+            }
+            label{
+                color: orange;
+            }
+            form{
+                padding-top: 2%;
+            }
+            
+            .carousel-indicators li {
+                border-color: #F7A855;
+                top: 90%;
+		          right: 25px;
+		          z-index: 31;
+            }
+
+            .carousel-indicators .active {
+                background-color: #F7A855;
+                                top: 90%;
+		          right: 25px;
+		          z-index: 31;
+            }
+            .carousel-indicators {
+                position: absolute;
+                left: 80%;
+            }
+/*            .item 
+            {
+                height:50%;    
+            }*/
+
+            .caption
+            {
+             text-align:left;
+             background:#000000;
+             color:white;
+             opacity:0.2;
+            width: inherit;
+                
+                height:9%;
+             /*transition:opacity 0.3s;*/
+            /* padding:20px;*/
+             /*border-radius:20px 20px 0 0;*/
+             /*bottom:8px;*/
+            }
+
+            .my-tab .tab-pane{border:none ;}
+            #myTab li a { color:white; border-color: transparent; background:#F7A860; background: rgba(255, 162, 3, 0.5); }
+            #myTab li.active a {color: black; border-bottom-color: transparent;background-color:white; opacity: 1}
+            .tab-content .tab-pane{ border:transparent;  border-top: 0; background-color:#FFFFFF;}
+            
+            /*jQuery Validation*/
+            #form1 input.error {
+                border:1px solid red;
+            }
+            #form1 select.error {
+                border:1px solid red;
+            }
+            #form1 label.error {
+                color:red;
+                position: absolute;
+                left: 20px;
+            }
+            label, #heading {
+                color:#F7A860;
+            }
+            
+        </style>
+        
+        <script type="text/javascript">
+           $().ready( function() {
+                $("#form1").validate( {
+                    
+                    rules: {
+                        street: "required",
+                        city: "required",
+                        state: "required"            
+                    },
+                    messages: {
+                        street: "This field is required",
+                        city: "This field is required",
+                        state: "Required"
+                    },
+                    submitHandler: function() {
+                        ajaxCall();
+                    }
+                });
+
+            });
+            function shareOnFacebook()
+            {
+                
+                    zillow_description = "Last Sold Price: "+ lastSoldPriceValue+ ", 30 Days overall change: "+fbOverallValueChange; 
+                      window.fbAsyncInit = function() {
+                        FB.init({
+                          appId      : '1508247319459907',
+                          xfbml      : true,
+                          version    : 'v2.1'
+                        });
+                      
+                      FB.ui(
+                          {
+                            method: 'feed',
+                            link: homeDetailsValue,
+                            picture: chartUrl10,
+                            name:streetResponseValue+","+cityResponseValue+","+stateResponseValue+"-"+zipResponseValue,
+                            caption: 'Property information from Zillow.com',
+                            display:'popup',
+                            description: zillow_description                              
+                          },
+                          function(response) {
+                            if (response && !response.error_code) {
+                              alert('Posted Successfully.');
+                            } else {
+                              alert('Error while posting.');
+                            }
+                          }
+                        );
+                      };
+                      
+                      (function(d, s, id){
+                         var js, fjs = d.getElementsByTagName(s)[0];
+                         if (d.getElementById(id)) {return;}
+                         js = d.createElement(s); js.id = id;
+                         js.src = "//connect.facebook.net/en_US/sdk.js";
+                         fjs.parentNode.insertBefore(js, fjs);
+                       }(document, 'script', 'facebook-jssdk'));
+            }
+            function ajaxCall()
+            {
+                var streetInput = document.getElementById("streetAddress").value;
+                var city = document.getElementById("city").value;
+                var state = document.getElementById("states").value;
+                                
+                $.ajax({
+                url:"http://cs-server.usc.edu:33187/web8/ppsHw8.php/?street="+streetInput+"&city="+city+"&state="+state,
+                type:'GET',
+                async:false,
+                success: function(output){
+                    var parsedJson = JSON.parse(output);
+                    var valid = parsedJson.valid;
+                    if(valid=="0")
+                    {
+                        var homeDetailsName = parsedJson.homeDetails.name;
+                        homeDetailsValue = parsedJson.homeDetails.value;
+
+                        var streetResponseName = parsedJson.streetResponse.name;
+                        streetResponseValue = parsedJson.streetResponse.value;
+
+                        var cityResponseName = parsedJson.cityResponse.name;
+                        cityResponseValue = parsedJson.cityResponse.value;
+
+                        var stateResponseName = parsedJson.stateResponse.name;
+                        stateResponseValue = parsedJson.stateResponse.value;
+
+                        var zipResponseName = parsedJson.zipResponse.name;
+                        zipResponseValue = parsedJson.zipResponse.value;
+
+                        var propertyTypeName = parsedJson.propertyType.name;
+                        var propertyTypeValue = parsedJson.propertyType.value;
+
+                        var lastSoldPriceName = parsedJson.lastSoldPrice.name;
+                        lastSoldPriceValue = parsedJson.lastSoldPrice.value;
+
+                        var yearBuiltName = parsedJson.yearBuilt.name;
+                        var yearBuiltValue = parsedJson.yearBuilt.value;
+
+                        var lastSoldDateName = parsedJson.lastSoldDate.name;
+                        var lastSoldDateValue = parsedJson.lastSoldDate.value;
+
+                        var lotSizeName = parsedJson.lotSize.name;
+                        var lotSizeValue = parsedJson.lotSize.value;
+
+                        var zestimateName = parsedJson.zestimate.name;
+                        var zestimateValue = parsedJson.zestimate.value;
+
+                        var finishedAreaName = parsedJson.finishedArea.name;
+                        var finishedAreaValue = parsedJson.finishedArea.value;
+
+                        var overallChangeName = parsedJson.overallChange.name;
+                        var overallChangeValue = parsedJson.overallChange.value;
+
+                        var bathroomsName = parsedJson.bathrooms.name;
+                        var bathroomsValue = parsedJson.bathrooms.value;
+
+                        var allTimePropertyRangeName = parsedJson.allTimePropertyRange.name;
+                        var allTimePropertyRangeValue = parsedJson.allTimePropertyRange.value;
+
+                        var bedroomsName = parsedJson.bedrooms.name;
+                        var bedroomsValue = parsedJson.bedrooms.value;
+
+                        var rentZestimateName = parsedJson.rentZestimate.name;
+                        var rentZestimateValue = parsedJson.rentZestimate.value;
+
+                        var taxAssessmentYearName = parsedJson.taxAssessmentYear.name;
+                        var taxAssessmentYearValue = parsedJson.taxAssessmentYear.value;
+
+                        var monthRentRangeName = parsedJson.monthRentChange.name;
+                        var monthRentRangeValue = parsedJson.monthRentChange.value;
+
+                        var taxAssessmentName = parsedJson.taxAssessment.name;
+                        var taxAssessmentValue = parsedJson.taxAssessment.value;
+
+                        var allTimeRentChangeName = parsedJson.allTimeRentChange.name;
+                        var allTimeRentChangeValue = parsedJson.allTimeRentChange.value;
+                        
+                        var chartUrl1 = parsedJson.chartUrl1;
+                        var chartUrl5 = parsedJson.chartUrl5;
+                        chartUrl10 = parsedJson.chartUrl10;
+                        
+                        fbOverallValueChange = parsedJson.fbOverallValueChange;
+                        
+                        document.getElementById("seeMoreDetails").innerHTML = "See more details for <a style=\"color:orange\" href=\""+homeDetailsValue+"\">"+streetResponseValue+", "+cityResponseValue+", "+stateResponseValue+"-"+zipResponseValue+"</a> on Zillow";
+                        
+                        document.getElementById("prVaName").innerHTML = propertyTypeName;
+                        document.getElementById("prVaValue").innerHTML= propertyTypeValue;
+                        
+                        document.getElementById("laSoPrName").innerHTML = lastSoldDateName;
+                        document.getElementById("laSoPrValue").innerHTML = lastSoldDateValue;
+                        
+                        document.getElementById("yeBuName").innerHTML = yearBuiltName;
+                        document.getElementById("yeBuValue").innerHTML = yearBuiltValue;
+                        
+                        document.getElementById("laSoDaName").innerHTML = lastSoldPriceName;
+                        document.getElementById("laSoDaValue").innerHTML = lastSoldPriceValue;
+                        
+                        document.getElementById("loSiName").innerHTML = lotSizeName;
+                        document.getElementById("loSiValue").innerHTML = lotSizeValue;
+                        
+                        document.getElementById("zePrName").innerHTML = zestimateName;
+                        document.getElementById("zePrValue").innerHTML = zestimateValue;
+                        
+                        document.getElementById("fiArName").innerHTML = finishedAreaName;
+                        document.getElementById("fiArValue").innerHTML = finishedAreaValue;
+                        
+                        document.getElementById("30DaName").innerHTML = overallChangeName;
+                        document.getElementById("30DaValue").innerHTML = overallChangeValue;
+                        
+                        document.getElementById("baName").innerHTML = bathroomsName;
+                        document.getElementById("baValue").innerHTML = bathroomsValue;
+                        
+                        document.getElementById("alTiName").innerHTML = allTimePropertyRangeName;
+                        document.getElementById("alTiValue").innerHTML = allTimePropertyRangeValue;
+                        
+                        document.getElementById("beName").innerHTML = bedroomsName;
+                        document.getElementById("beValue").innerHTML = bedroomsValue;
+                        
+                        document.getElementById("reEsName").innerHTML = rentZestimateName;
+                        document.getElementById("reEsValue").innerHTML = rentZestimateValue;
+                        
+                        document.getElementById("taAsYeName").innerHTML = taxAssessmentYearName;
+                        document.getElementById("taAsYeValue").innerHTML = taxAssessmentYearValue;
+                        
+                        document.getElementById("30ReName").innerHTML = monthRentRangeName;
+                        document.getElementById("30ReValue").innerHTML = monthRentRangeValue;
+                        
+                        document.getElementById("taAsName").innerHTML = taxAssessmentName;
+                        document.getElementById("taAsValue").innerHTML = taxAssessmentValue;
+                        
+                        document.getElementById("alTiReName").innerHTML = allTimeRentChangeName;
+                        document.getElementById("alTiReValue").innerHTML = allTimeRentChangeValue;
+                        
+                        document.getElementById("chart1").src = chartUrl1;
+                        document.getElementById("cap1").innerHTML = streetResponseValue + " " + cityResponseValue + " " + zipResponseValue;
+                        document.getElementById("chart5").src = chartUrl5;
+                        document.getElementById("cap5").innerHTML = streetResponseValue + " " + cityResponseValue + " " + zipResponseValue;
+                        document.getElementById("chart10").src = chartUrl10;
+                        document.getElementById("cap10").innerHTML = streetResponseValue + " " + cityResponseValue + " " + zipResponseValue;
+                        
+                        
+                        
+                        document.getElementById("tabsDiv").style.display="inline";
+                        document.getElementById("noMatch").style.display="none";
+                    }
+                    else
+                    {
+                        document.getElementById("noMatch").style.display="inline";
+                        document.getElementById("tabsDiv").style.display="none";
+                    }
+                },
+                error: function(){
+                    alert("fail");
+                }
+                    
+                });
+            }
+            
+        </script>
+        
+    </head>
+    
+    <body background="http://www.neovisual.cz/files/V0779-d9.jpg">
+        <div class="container-fluid">
+            <div class="searchHeading"><h3>Search Your Property Here</h3></div>
+            <form action="" method="" role="form" class="form-horizontal" id="form1">
+                <div class="row">   
+                    <div class="clearfix hidden-md hidden-lg col-xs-12 col-sm-12" style="opacity:0.0">.</div>
+                    <div class="col-xs-12 col-sm-12 col-md-2 control-label">
+                        <label for="street">Street Address*:</label>
+                    </div>
+                    
+                    <div class="col-xs-12 col-sm-12 col-md-2">
+                        <input class="form-control" autofocus="autofocus" type="text" name="street" id="streetAddress" placeholder="Address"/>
+                    </div>
+                    <div class="clearfix hidden-md hidden-lg col-xs-12 col-sm-12" style="opacity:0.0">.</div>
+
+                    <div class="col-xs-12 col-sm-12 col-md-1 control-label">
+                        <label for="city">City*:</label>
+                    </div>
+                    
+                    <div class="col-xs-12 col-sm-12 col-md-2">        
+                        <input class="form-control" type="text" name="city" id="city" placeholder="City"/>
+                    </div>
+                    <div class="clearfix hidden-md hidden-lg col-xs-12 col-sm-12" style="opacity:0.0">.</div>
+                    
+                    <div class="col-xs-12 col-sm-12 col-md-1 control-label">
+                        <label for="state">State*:</label>
+                    </div>
+
+                    <div class="col-xs-12 col-sm-12 col-md-1">
+                        <select class="form-control" name="state" id="states">
+                            <option value="" selected></option>
+                            <option value="AL">AL</option>
+                            <option value="AK">AK</option>
+                            <option value="AZ">AZ</option>
+                            <option value="AR">AR</option>
+                            <option value="CA">CA</option>
+                            <option value="CO">CO</option>
+                            <option value="CT">CT</option>
+                            <option value="DE">DE</option>
+                            <option value="DC">DC</option>
+                            <option value="FL">FL</option>
+                            <option value="GA">GA</option>
+                            <option value="HI">HI</option>
+                            <option value="ID">ID</option>
+                            <option value="IL">IL</option>
+                            <option value="IN">IN</option>
+                            <option value="IA">IA</option>
+                            <option value="KS">KS</option>
+                            <option value="KY">KY</option>
+                            <option value="LA">LA</option>
+                            <option value="ME">ME</option>
+                            <option value="MD">MD</option>
+                            <option value="MA">MA</option>
+                            <option value="MI">MI</option>
+                            <option value="MN">MN</option>
+                            <option value="MS">MS</option>
+                            <option value="MO">MO</option>
+                            <option value="MT">MT</option>
+                            <option value="NE">NE</option>
+                            <option value="NV">NV</option>
+                            <option value="NH">NH</option>
+                            <option value="NJ">NJ</option>
+                            <option value="NM">NM</option>
+                            <option value="NY">NY</option>
+                            <option value="NC">NC</option>
+                            <option value="ND">ND</option>
+                            <option value="OH">OH</option>
+                            <option value="OK">OK</option>
+                            <option value="OR">OR</option>
+                            <option value="PA">PA</option>
+                            <option value="RI">RI</option>
+                            <option value="SC">SC</option>
+                            <option value="SD">SD</option>
+                            <option value="TN">TN</option>
+                            <option value="TX">TX</option>
+                            <option value="UT">UT</option>
+                            <option value="VT">VT</option>
+                            <option value="VA">VA</option>
+                            <option value="WA">WA</option>
+                            <option value="WV">WV</option>
+                            <option value="WI">WI</option>
+                            <option value="WY">WY</option>
+                        </select>   
+                    </div>
+                    <div class="clearfix hidden-md hidden-lg col-xs-12 col-sm-12" style="opacity:0.0">.</div>
+                    <div class="col-xs-12 col-sm-12 col-md-1">
+                        <input type="submit" class="btn btn-warning" name="submit" value="SUBMIT"/>
+                    </div>
+                    <div class="clearfix hidden-md hidden-lg col-xs-12 col-sm-12" style="opacity:0.0">.</div>
+                    <div class="col-xs-12 col-sm-12 col-md-2">
+                        <a href="http://www.zillow.com"><img src = "http://www.zillow.com/widgets/GetVersionedResource.htm?path=/static/logos/Zillowlogo_150x40_rounded.gif"/></a>
+                    </div>    
+                </div> 
+            </form>
+            <hr />
+                             
+            <div id ="noMatch" style="display:none;color:red"><p align=center>No exact match found--Verify that the given address is correct.</p></div>
+            <div role="tabpanel" id="tabsDiv" class="col-xs-12 col-sm-12 col-md-12" style="display:none;">
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li role="basicInfo" class="active"><a href="#basicInfo" aria-controls="home" role="tab" data-toggle="tab">Basic Info</a></li>
+                    <li role="history"><a href="#historicalEstimates" aria-controls="profile" role="tab" data-toggle="tab">Historical Zestimates</a></li> 
+                </ul>   
+                
+                <!-- Tab panes -->
+                <div class="tab-content" >
+                    <div role="tabpanel" class="tab-pane active" id="basicInfo">
+                        <div class="table-responsive">
+                            <table style="background-color:white" class="table table-striped" >
+                            <tr>
+                                <td colspan="2" id="seeMoreDetails">                            
+                                </td>
+                                <td colspan="2" align="right">
+                                    <input type="image" src="https://www.iceland.co.uk/_images/iceland/buttons/share-facebook.png" onclick="shareOnFacebook()"/>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td id="prVaName">
+                                </td>
+                                
+                                <td id="prVaValue" align="right">
+                                </td>
+                                
+                                <td id="laSoDaName">
+                                </td>
+                                
+                                <td id="laSoDaValue" align="right">
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td id="yeBuName">
+                                </td>
+                                
+                                <td id="yeBuValue" align="right">
+                                </td>
+                                
+                                <td id="laSoPrName">
+                                </td>
+                                
+                                <td id="laSoPrValue" align="right">
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td id="loSiName">
+                                </td>
+                                
+                                <td id="loSiValue" align="right">
+                                </td>
+                                
+                                <td id="zePrName">
+                                </td>
+                                
+                                <td id="zePrValue" align="right">
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td id="fiArName">
+                                </td>
+                                
+                                <td id="fiArValue" align="right">
+                                </td>
+                                
+                                <td id="30DaName">
+                                </td>
+                                
+                                <td id="30DaValue" align="right">
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td id="baName">
+                                </td>
+                                
+                                <td id="baValue" align="right">
+                                </td>
+                                
+                                <td id="alTiName">
+                                </td>
+                                
+                                <td id="alTiValue"align="right">
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td id="beName">
+                                </td>
+                                
+                                <td id="beValue" align="right">
+                                </td>
+                                
+                                <td id="reEsName">
+                                </td>
+                                
+                                <td id="reEsValue" align="right">
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td id="taAsYeName">
+                                </td>
+                                
+                                <td id="taAsYeValue" align="right">
+                                </td>
+                                
+                                <td id="30ReName">
+                                </td>
+                                
+                                <td id="30ReValue" align="right">
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td id="taAsName">
+                                </td>
+                                
+                                <td id="taAsValue" align="right">
+                                </td>
+                                
+                                <td id="alTiReName">
+                                </td>
+                                
+                                <td id="alTiReValue" align="right">
+                                </td>
+                            </tr>
+                            
+                            
+                            
+                            
+                        </table>
+                        </div>
+                    </div>
+                    
+                    <div role="tabpanel" class="tab-pane" id="historicalEstimates" style="background-color:white">
+                        <div id="carousel-example-generic" class="carousel slide" data-interval="3000" data-ride="carousel">
+                          <!-- Indicators -->
+                          <ol class="carousel-indicators">
+                            <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+                            <li data-target="#carousel-example-generic" data-slide-to="1"></li>
+                            <li data-target="#carousel-example-generic" data-slide-to="2"></li>
+                          </ol>
+
+                          <!-- Wrapper for slides -->
+                          <div class="carousel-inner" role="listbox">
+                            <div class="item active">
+                                <img id="chart1" src="" class="img-responsive center-block"/>
+                                <div class="caption">
+                                    Historical Zestimates for the past 1 year
+                                    <p id="cap1"></p>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <img id="chart5" src="" class="img-responsive center-block">
+                                    <div class="caption">
+                                    Historical Zestimates for the past 5 years
+                                    <p id="cap5"></p>
+                                </div>    
+                            </div>
+                              <div class="item">
+                                  <img id="chart10" src="" class="img-responsive center-block">
+                                <div class="caption">
+                                    Historical Zestimates for the past 10 years
+                                    <p id="cap10"></p>
+                                </div>                                
+                              </div>
+                          </div>
+
+                          <!-- Controls -->
+                          <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+                            <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                          </a>
+                          <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+                            <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                          </a>
+                        </div>
+                    </div>                              
+                </div>
+            </div>
+                 
+        </div>
+ <p align="center" style="color:white"> &#169; Zillow, Inc., 2006-2014. Use is subject to <a style="color:orange" target=\"_blank\" href="http://www.zillow.com/corp/Terms.htm"> Terms of Use </a> <br> <a style="color:orange" target=\"_blank\" href="http://www.zillow.com/zestimate/">What's a Zestimate? </a> </p>  
+    </body>
+    <noscript>
+</html>
